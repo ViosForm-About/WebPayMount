@@ -8,9 +8,7 @@
     { "src": "/storage/(.*)", "dest": "/storage/$1" },
     { "src": "/(.*)", "dest": "/$1" }
   ],
-  "github": { "silent": true },
-  "env": {
-    "ATLANTIC_API_KEY": "ca0uoSsJpUuTEVUBo2Wmu01eAtZH6eoYWbcEQkU4JxcxSBciNPMTUWzF4Mcb8A61Km9d4SOZ2eeXY64FAt9MgIImudkjLVAxvfj0",
-    "ATLANTIC_BASE_URL": "https://atlantich2h.com"
+  "github": {
+    "silent": true
   }
 }
