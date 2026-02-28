@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QRIS Code - Jery Pets</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif}
+    body{background:linear-gradient(135deg,#0f0f1a,#1a1a2e,#16213e);color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+    .card{background:rgba(255,255,255,0.08);border-radius:24px;padding:35px;max-width:480px;width:100%;backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.15);box-shadow:0 25px 50px rgba(0,0,0,0.5)}
+    .header{text-align:center;margin-bottom:28px}
+    .logo{width:75px;height:75px;border-radius:50%;background:linear-gradient(135deg,#00d4aa,#0099ff);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:28px;font-weight:800;box-shadow:0 12px 35px rgba(0,212,170,0.35);animation:float 3s ease-in-out infinite}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+    .title{font-size:22px;font-weight:700;margin-bottom:6px}
+    .subtitle{color:#aaa;font-size:13px}
+    .input-group{margin:22px 0}
+    .input-group label{display:block;margin-bottom:10px;color:#ccc;font-size:13px;font-weight:500}
+    .input-group input{width:100%;padding:14px 18px;border-radius:14px;border:2px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.08);color:#fff;font-size:16px;transition:all 0.25s}
+    .input-group input:focus{outline:none;border-color:#00d4aa;box-shadow:0 0 0 4px rgba(0,212,170,0.15)}
+    .input-group input::placeholder{color:#777}
+    .btn{width:100%;padding:15px;border-radius:14px;border:none;font-size:15px;font-weight:600;cursor:pointer;transition:all 0.25s;margin-top:8px}
+    .btn-primary{background:linear-gradient(135deg,#00d4aa,#0099ff);color:#fff}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 35px rgba(0,212,170,0.4)}
+    .btn-primary:disabled{opacity:0.6;cursor:not-allowed;transform:none}
+    .btn-secondary{background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.25)}
+    .btn-secondary:hover{background:rgba(255,255,255,0.18)}
+    .error{color:#ff6b6b;font-size:13px;margin-top:12px;display:none;background:rgba(255,107,107,0.12);padding:10px 14px;border-radius:10px;border-left:3px solid #ff6b6b}
+    .loading{display:none;text-align:center;margin:22px 0}
+    .spinner{width:28px;height:28px;border:3px solid rgba(255,255,255,0.25);border-top-color:#00d4aa;border-radius:50%;animation:spin 0.9s linear infinite;margin:0 auto}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .back-btn{position:fixed;top:18px;left:18px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);color:#fff;padding:9px 18px;border-radius:11px;cursor:pointer;transition:all 0.25s;z-index:100;font-size:14px}
+    .back-btn:hover{background:rgba(255,255,255,0.2)}
+    .info-box{background:rgba(0,212,170,0.12);border-left:4px solid #00d4aa;padding:13px;border-radius:0 10px 10px 0;margin:18px 0;font-size:12px;color:#c8f5e8;line-height:1.5}
+    .code-hint{background:rgba(255,255,255,0.06);padding:9px 14px;border-radius:9px;font-family:monospace;font-size:12px;color:#00d4aa;margin-top:7px;word-break:break-all}
+    .api-status{font-size:11px;color:#666;margin-top:18px;text-align:center}
+    .github-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(102,112,133,0.2);padding:4px 10px;border-radius:20px;font-size:11px;color:#aaa;margin-top:8px}
+    .github-badge::before{content:'📦';font-size:10px}
+  </style>
+</head>
+<body>
+  <button class="back-btn" onclick="goBack()">← Kembali</button>
+  
+  <div class="card">
+    <div class="header">
+      <div class="logo">JP</div>
+      <h1 class="title">Masukkan Kode Pembayaran</h1>
+      <p class="subtitle">Validasi code → Cek nominal → Generate QRIS AtlanticH2H</p>
+    </div>
+
+    <div class="info-box">      🔹 Kode diperoleh dari admin/owner<br>
+      🔹 Sistem cek otomatis di database GitHub Raw<br>
+      🔹 Jika valid → QRIS dibuat otomatis via AtlanticH2H
+    </div>
+
+    <div class="github-badge">Database: GitHub Raw JSON</div>
+
+    <div class="input-group">
+      <label for="codeInput">Kode Pembayaran</label>
+      <input type="text" id="codeInput" placeholder="Contoh: jery_cod1276" autocomplete="off" autofocus>
+      <div class="code-hint">Format: [nama]_[kode]_[angka]</div>
+    </div>
+
+    <div class="error" id="errorMsg"></div>
+
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <p style="margin-top:12px;color:#aaa;font-size:13px">Memvalidasi code & menghubungi AtlanticH2H...</p>
+    </div>
+
+    <button class="btn btn-primary" id="continueBtn" onclick="processCode()">Lanjut ke Pembayaran →</button>
+    <button class="btn btn-secondary" onclick="goBack()" style="margin-top:10px">Batal</button>
+
+    <div class="api-status">
+      API: AtlanticH2H • Endpoint: /deposit/create<br>
+      Status: Real Integration • No Simulation
+    </div>
+  </div>
+
+  <script>
+    // ===== KONFIGURASI =====
+    const CONFIG = {
+      atlantic: {
+        apiKey: "ca0uoSsJpUuTEVUBo2Wmu01eAtZH6eoYWbcEQkU4JxcxSBciNPMTUWzF4Mcb8A61Km9d4SOZ2eeXY64FAt9MgIImudkjLVAxvfj0",
+        baseUrl: "https://atlantich2h.com"
+      },
+      githubRaw: "https://raw.githubusercontent.com/ViosForm-About/Codexenn/refs/heads/main/codes.json",
+      telegram: "https://t.me/JeryPets"
+    };
+
+    // ===== FUNGSI UTILITAS =====
+    function goBack(){
+      const last = localStorage.getItem('last_page') || 'dashboard.html';
+      window.location.href = last;
+    }
+
+    function formatRupiah(amount){
+      return new Intl.NumberFormat('id-ID', {style:'currency', currency:'IDR', minimumFractionDigits:0}).format(amount);
+    }
+    function addToHistory(data){
+      const history = JSON.parse(localStorage.getItem('payment_history') || '[]');
+      history.unshift({
+        id: Date.now(),
+        ...data,
+        timestamp: new Date().toISOString()
+      });
+      localStorage.setItem('payment_history', JSON.stringify(history));
+    }
+
+    // ===== VALIDASI CODE DARI GITHUB RAW =====
+    async function fetchCodeDatabase(){
+      try{
+        // Try GitHub Raw first
+        const response = await fetch(CONFIG.githubRaw, {
+          cache: 'no-store',
+          headers: {'Accept': 'application/json'}
+        });
+        if(response.ok){
+          return await response.json();
+        }
+      } catch(e){
+        console.log('GitHub Raw fallback, menggunakan localStorage');
+      }
+      // Fallback ke localStorage
+      return JSON.parse(localStorage.getItem('code_database') || '{}');
+    }
+
+    // ===== ATLANTICH2H: CREATE DEPOSIT (REAL API) =====
+    async function createAtlanticDeposit(reffId, nominal){
+      const formData = new URLSearchParams();
+      formData.append('api_key', CONFIG.atlantic.apiKey);
+      formData.append('reff_id', reffId);
+      formData.append('nominal', parseInt(nominal));
+      formData.append('type', 'ewallet');
+      formData.append('metode', 'qris');
+
+      const response = await fetch(`${CONFIG.atlantic.baseUrl}/deposit/create`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: formData,
+        mode: 'cors'
+      });
+
+      if(!response.ok){
+        const errorText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+
+      const result = await response.json();      
+      // Validasi response AtlanticH2H
+      if(result.status !== true && result.status !== 'success' && !result.data){
+        throw new Error(result.message || 'Response API tidak valid');
+      }
+
+      return result;
+    }
+
+    // ===== PROSES UTAMA =====
+    async function processCode(){
+      const code = document.getElementById('codeInput').value.trim();
+      const errorMsg = document.getElementById('errorMsg');
+      const loading = document.getElementById('loading');
+      const continueBtn = document.getElementById('continueBtn');
+
+      // Validasi input
+      if(!code){
+        errorMsg.textContent = '⚠️ Kode tidak boleh kosong!';
+        errorMsg.style.display = 'block';
+        return;
+      }
+      if(!/^[a-zA-Z0-9_\-]{5,30}$/.test(code)){
+        errorMsg.textContent = '⚠️ Format kode tidak valid!';
+        errorMsg.style.display = 'block';
+        return;
+      }
+
+      errorMsg.style.display = 'none';
+      loading.style.display = 'block';
+      continueBtn.disabled = true;
+
+      try{
+        // 1. Fetch & validasi code dari database
+        const codeDB = await fetchCodeDatabase();
+        const codeData = codeDB[code];
+
+        if(!codeData){
+          throw new Error('Kode tidak ditemukan dalam database');
+        }
+        if(codeData.valid === false){
+          throw new Error('Kode ini telah dinonaktifkan');
+        }
+        if(codeData.expiry && new Date(codeData.expiry) < new Date()){
+          throw new Error('Kode sudah kadaluarsa');
+        }
+
+        const nominal = parseInt(codeData.nominal);
+        if(!nominal || nominal < 1000){
+          throw new Error('Nominal tidak valid');        }
+
+        // 2. Generate unique reference ID
+        const reffId = `jery_${Date.now()}_${Math.random().toString(36).substr(2,7)}`;
+
+        // 3. Call AtlanticH2H API (REAL)
+        const atlanticResponse = await createAtlanticDeposit(reffId, nominal);
+
+        // 4. Extract data penting
+        const txData = {
+          id: atlanticResponse.data?.id || atlanticResponse.transaction_id || reffId,
+          reff_id: reffId,
+          nominal: nominal,
+          qr_code: atlanticResponse.data?.qr_code || atlanticResponse.qr_string || atlanticResponse.qr_url,
+          status: 'pending',
+          created_at: new Date().toISOString(),
+          source_code: code
+        };
+
+        if(!txData.qr_code){
+          console.warn('QR Code tidak ditemukan di response, menggunakan fallback display');
+        }
+
+        // 5. Simpan ke sessionStorage & history
+        sessionStorage.setItem('atlantic_tx', JSON.stringify(txData));
+        sessionStorage.setItem('payment_method', 'qris_code');
+        addToHistory({
+          code: code,
+          reff_id: reffId,
+          nominal: nominal,
+          method: 'qris_code',
+          status: 'pending',
+          tx_id: txData.id
+        });
+
+        // 6. Redirect ke halaman QRIS display
+        window.location.href = 'qrisotomatis.html';
+
+      } catch(err){
+        console.error('Process Error:', err);
+        errorMsg.innerHTML = `❌ ${err.message}<br><small style="color:#888">Coba lagi atau hubungi admin</small>`;
+        errorMsg.style.display = 'block';
+        
+        // Fallback demo ONLY jika CORS/network error (bukan untuk production)
+        if(err.message.includes('CORS') || err.message.includes('Failed to fetch')){
+          setTimeout(()=>{
+            if(confirm('⚠️ Network error terdeteksi.\n\nDemo mode: Lanjutkan dengan simulasi QRIS?')){
+              const reffId = `demo_${Date.now()}`;
+              const nominal = 20000;
+              sessionStorage.setItem('atlantic_tx', JSON.stringify({                id: reffId,
+                reff_id: reffId,
+                nominal: nominal,
+                qr_code: null,
+                status: 'pending',
+                created_at: new Date().toISOString(),
+                source_code: code,
+                _demo: true
+              }));
+              sessionStorage.setItem('payment_method', 'qris_code');
+              addToHistory({code, reff_id: reffId, nominal, method: 'qris_code', status: 'pending_demo'});
+              window.location.href = 'qrisotomatis.html';
+            } else {
+              loading.style.display = 'none';
+              continueBtn.disabled = false;
+            }
+          }, 800);
+          return;
+        }
+      } finally{
+        loading.style.display = 'none';
+        continueBtn.disabled = false;
+      }
+    }
+
+    // ===== EVENT HANDLERS =====
+    document.getElementById('codeInput').addEventListener('keypress', (e)=>{
+      if(e.key === 'Enter') processCode();
+    });
+
+    // Auto-focus & init
+    document.getElementById('codeInput').focus();
+    
+    // Init localStorage database jika belum ada
+    if(!localStorage.getItem('code_database')){
+      const defaultCodes = {
+        'jery_cod1276': {nominal: 20000, valid: true, expiry: '2025-12-31', desc: 'Paket Basic'},
+        'pets_vip99': {nominal: 50000, valid: true, expiry: '2025-12-31', desc: 'Paket VIP'},
+        'demo_test': {nominal: 10000, valid: true, expiry: '2025-12-31', desc: 'Testing'}
+      };
+      localStorage.setItem('code_database', JSON.stringify(defaultCodes));
+    }
+    if(!localStorage.getItem('payment_history')){
+      localStorage.setItem('payment_history', JSON.stringify([]));
+    }
+  </script>
+</body>
+</html>

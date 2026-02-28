@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QRIS Manual - Jery Pets</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif}
+    body{background:linear-gradient(135deg,#0f0f1a,#1a1a2e,#16213e);color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+    .card{background:rgba(255,255,255,0.08);border-radius:24px;padding:35px;max-width:450px;width:100%;backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.15);box-shadow:0 25px 50px rgba(0,0,0,0.5);text-align:center}
+    .header{margin-bottom:25px}
+    .logo{width:75px;height:75px;border-radius:50%;background:linear-gradient(135deg,#00d4aa,#0099ff);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:28px;font-weight:800;box-shadow:0 12px 35px rgba(0,212,170,0.35)}
+    .title{font-size:22px;font-weight:700;margin-bottom:6px}
+    .subtitle{color:#aaa;font-size:13px}
+    .qr-box{background:#fff;border-radius:20px;padding:25px;margin:25px 0;display:inline-block;box-shadow:0 15px 40px rgba(0,0,0,0.4)}
+    .qr-image{width:220px;height:220px;object-fit:contain;border-radius:12px}
+    .qr-placeholder{width:220px;height:220px;background:linear-gradient(135deg,#f0f0f0,#e0e0e0);border-radius:15px;display:flex;align-items:center;justify-content:center;color:#666;font-size:13px;font-weight:500}
+    .info-box{background:rgba(100,149,237,0.15);border-left:4px solid #6495ed;padding:14px;border-radius:0 10px 10px 0;margin:20px 0;font-size:13px;color:#c8d8ff;text-align:left}
+    .btn{width:100%;padding:15px;border-radius:14px;border:none;font-size:15px;font-weight:600;cursor:pointer;transition:all 0.25s;margin-top:10px}
+    .btn-primary{background:linear-gradient(135deg,#00d4aa,#0099ff);color:#fff}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 35px rgba(0,212,170,0.4)}
+    .btn-secondary{background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.25)}
+    .btn-secondary:hover{background:rgba(255,255,255,0.18)}
+    .back-btn{position:fixed;top:18px;left:18px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);color:#fff;padding:9px 18px;border-radius:11px;cursor:pointer;transition:all 0.25s;z-index:100;font-size:14px}
+    .back-btn:hover{background:rgba(255,255,255,0.2)}
+    .no-api-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(102,112,133,0.25);padding:5px 12px;border-radius:20px;font-size:11px;color:#aaa;margin:12px 0}
+    .no-api-badge::before{content:'📷';font-size:10px}
+    .storage-note{font-size:11px;color:#666;margin-top:15px}
+  </style>
+</head>
+<body>
+  <button class="back-btn" onclick="goBack()">← Kembali</button>
+  
+  <div class="card">
+    <div class="header">
+      <div class="logo">📷</div>
+      <h1 class="title">QRIS Manual</h1>
+      <p class="subtitle">Scan kode QR berikut untuk membayar</p>
+    </div>
+
+    <div class="no-api-badge">Mode: Foto Static • Tanpa API AtlanticH2H</div>
+
+    <div class="info-box">
+      📱 Buka aplikasi Dana/OVO/GO-PAY/ShopeePay<br>
+      🔍 Pilih menu "Scan QRIS"<br>
+      📸 Arahkan kamera ke kode QR di bawah<br>
+      ✅ Konfirmasi pembayaran sesuai nominal
+    </div>
+
+    <div class="qr-box">      <img src="storage/qris-manual.jpg" 
+           class="qr-image" 
+           alt="QRIS Manual Jery Pets"
+           onerror="this.parentElement.innerHTML='<div class=\\'qr-placeholder\\'>❌ Gambar tidak ditemukan<br><small>Upload file ke storage/qris-manual.jpg</small></div>'">
+    </div>
+
+    <div class="storage-note">
+      📁 Sumber: storage/qris-manual.jpg<br>
+      🔄 Update gambar dengan replace file di folder storage/
+    </div>
+
+    <button class="btn btn-primary" onclick="confirmManualPayment()">✓ Saya Sudah Scan & Bayar</button>
+    <button class="btn btn-secondary" onclick="goBack()">Batal</button>
+  </div>
+
+  <script>
+    function goBack(){
+      const last = localStorage.getItem('last_page') || 'dashboard.html';
+      window.location.href = last;
+    }
+
+    function confirmManualPayment(){
+      // Simpan ke history
+      const history = JSON.parse(localStorage.getItem('payment_history') || '[]');
+      history.unshift({
+        id: Date.now(),
+        method: 'qris_manual',
+        nominal: 0, // User input manual di app e-wallet
+        status: 'pending_manual',
+        timestamp: new Date().toISOString(),
+        note: 'Menunggu konfirmasi admin'
+      });
+      localStorage.setItem('payment_history', JSON.stringify(history));
+
+      // Redirect ke success page
+      if(confirm('Konfirmasi: Anda sudah melakukan pembayaran via QRIS Manual?')){
+        sessionStorage.setItem('payment_success', 'manual_confirmed');
+        sessionStorage.setItem('payment_method', 'qris_manual');
+        window.location.href = 'detailsucces.html';
+      }
+    }
+
+    // Init localStorage
+    if(!localStorage.getItem('payment_history')){
+      localStorage.setItem('payment_history', JSON.stringify([]));
+    }
+
+    // Preload image check
+    window.addEventListener('load', ()=>{
+      const img = new Image();      img.onerror = ()=>{
+        console.warn('⚠️ storage/qris-manual.jpg tidak ditemukan');
+      };
+      img.src = 'storage/qris-manual.jpg';
+    });
+  </script>
+</body>
+</html>

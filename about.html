@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tentang - Jery Pets</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif}
+    body{background:linear-gradient(135deg,#0f0f1a,#1a1a2e,#16213e);color:#fff;min-height:100vh;padding:20px}
+    .container{max-width:700px;margin:0 auto}
+    .card{background:rgba(255,255,255,0.08);border-radius:24px;padding:35px;backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.15);box-shadow:0 25px 50px rgba(0,0,0,0.5)}
+    .header{text-align:center;margin-bottom:28px}
+    .logo{width:75px;height:75px;border-radius:50%;background:linear-gradient(135deg,#00d4aa,#0099ff);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:28px;font-weight:800}
+    .title{font-size:22px;font-weight:700;margin-bottom:6px}
+    .subtitle{color:#aaa;font-size:13px}
+    .section{margin:25px 0}
+    .section-title{font-size:16px;font-weight:700;color:#00d4aa;margin-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.15);padding-bottom:8px}
+    .info-list{list-style:none}
+    .info-list li{padding:8px 0;color:#ccc;font-size:14px;border-bottom:1px dashed rgba(255,255,255,0.1)}
+    .info-list li:last-child{border-bottom:none}
+    .badge{display:inline-block;background:rgba(0,212,170,0.15);color:#00d4aa;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;margin:2px}
+    .api-box{background:rgba(0,0,0,0.25);border-radius:12px;padding:15px;font-family:monospace;font-size:12px;color:#00d4aa;overflow-x:auto;margin:12px 0}
+    .btn{display:inline-block;padding:12px 28px;border-radius:13px;background:linear-gradient(135deg,#00d4aa,#0099ff);color:#fff;font-weight:600;text-decoration:none;margin-top:15px;transition:transform 0.25s}
+    .btn:hover{transform:translateY(-2px)}
+    .back-btn{position:fixed;top:18px;left:18px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);color:#fff;padding:9px 18px;border-radius:11px;cursor:pointer;font-size:14px}
+    .footer{text-align:center;margin-top:30px;color:#666;font-size:12px}
+  </style>
+</head>
+<body>
+  <button class="back-btn" onclick="window.location.href='dashboard.html'">← Dashboard</button>
+  
+  <div class="container">
+    <div class="card">
+      <div class="header">
+        <div class="logo">ℹ️</div>
+        <h1 class="title">Tentang Sistem Pembayaran</h1>
+        <p class="subtitle">Jery Pets Payment Gateway</p>
+      </div>
+
+      <div class="section">
+        <div class="section-title">🔧 Teknologi</div>
+        <ul class="info-list">
+          <li><span class="badge">HTML5</span> <span class="badge">CSS3</span> <span class="badge">Vanilla JS</span></li>
+          <li>LocalStorage Database (History & Codes)</li>
+          <li>GitHub Raw JSON Integration (Code Validation)</li>
+          <li><span class="badge">AtlanticH2H Real API</span> - QRIS Payment Gateway</li>
+          <li>Vercel Static Deployment Ready</li>
+        </ul>
+      </div>
+      <div class="section">
+        <div class="section-title">🔗 AtlanticH2H API Endpoints</div>
+        <div class="api-box">
+POST https://atlantich2h.com/deposit/create<br>
+POST https://atlantich2h.com/deposit/status<br>
+POST https://atlantich2h.com/deposit/cancel<br>
+POST https://atlantich2h.com/get_profile
+        </div>
+        <small style="color:#888">Content-Type: application/x-www-form-urlencoded</small>
+      </div>
+
+      <div class="section">
+        <div class="section-title">📁 Struktur File</div>
+        <ul class="info-list">
+          <li>dashboard.html - Halaman utama</li>
+          <li>qriscode.html - Input code → AtlanticH2H</li>
+          <li>qrisotomatis.html - Input nominal → AtlanticH2H</li>
+          <li>qrismanual.html - Foto QRIS statis (NO API)</li>
+          <li>dana.html / ovo.html / gopay.html - Transfer manual</li>
+          <li>qriscreate.html - Display QR + status check</li>
+          <li>detailsucces.html - Halaman sukses + Telegram</li>
+          <li>storage/ - Folder aset (logo, music, qris-manual.jpg)</li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <div class="section-title">⚠️ Catatan Penting</div>
+        <ul class="info-list">
+          <li>API Key AtlanticH2H terintegrasi di client-side</li>
+          <li>Untuk production maksimal, gunakan Vercel Serverless Functions untuk menyembunyikan API Key</li>
+          <li>Pastikan endpoint AtlanticH2H mengizinkan CORS</li>
+          <li>Upload file aset ke folder <code>storage/</code> sebelum deploy</li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <div class="section-title">📞 Kontak & Support</div>
+        <ul class="info-list">
+          <li>Telegram Owner: <a href="https://t.me/JeryPets" style="color:#00d4aa">@jerypets_admin</a></li>
+          <li>AtlanticH2H Docs: <a href="https://atlantich2h.com" style="color:#00d4aa" target="_blank">atlantich2h.com</a></li>
+          <li>GitHub Repo: Ganti YOUR_USERNAME/YOUR_REPO di kode</li>
+        </ul>
+      </div>
+
+      <a href="dashboard.html" class="btn">← Kembali ke Dashboard</a>
+
+      <div class="footer">
+        <p>© 2024 Jery Pets • Built with ❤️ for seamless payments</p>
+      </div>
+    </div>  </div>
+</body>
+</html>

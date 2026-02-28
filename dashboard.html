@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jery Pets Payment</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif}
+    body{background:linear-gradient(135deg,#0f0f1a,#1a1a2e,#16213e);color:#fff;min-height:100vh;overflow-x:hidden}
+    .container{max-width:1100px;margin:0 auto;padding:20px}
+    .header{text-align:center;padding:35px 0 25px;position:relative}
+    .logo{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,#00d4aa,#0099ff);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:36px;font-weight:800;box-shadow:0 15px 40px rgba(0,212,170,0.4);animation:float 3s ease-in-out infinite}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+    .title{font-size:26px;font-weight:800;margin-bottom:8px;text-shadow:0 3px 15px rgba(0,0,0,0.4)}
+    .subtitle{color:#aaa;font-size:14px}
+    .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px;margin:28px 0}
+    .stat-box{background:rgba(255,255,255,0.08);border-radius:18px;padding:22px;text-align:center;backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.15);transition:transform 0.25s}
+    .stat-box:hover{transform:translateY(-4px)}
+    .stat-number{font-size:28px;font-weight:800;color:#00d4aa;margin:8px 0}
+    .stat-label{color:#aaa;font-size:13px}
+    .marquee{margin:35px 0;overflow:hidden}
+    .marquee-text{display:flex;animation:scroll 22s linear infinite;white-space:nowrap}
+    .marquee-text span{margin:0 35px;font-size:14px;color:#00d4aa;font-weight:600}
+    @keyframes scroll{0%{transform:translateX(100%)}100%{transform:translateX(-100%)}}
+    .methods{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:18px;margin:35px 0}
+    .method-card{background:rgba(255,255,255,0.08);border-radius:18px;padding:28px 18px;text-align:center;cursor:pointer;transition:all 0.25s;border:2px solid transparent;position:relative;overflow:hidden}
+    .method-card:hover{border-color:#00d4aa;transform:scale(1.04);background:rgba(0,212,170,0.12)}
+    .method-logo{width:65px;height:65px;border-radius:50%;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;box-shadow:0 10px 25px rgba(0,0,0,0.3)}
+    .method-logo.qris{background:linear-gradient(135deg,#00d4aa,#0099ff)}
+    .method-logo.dana{background:linear-gradient(135deg,#118eea,#0d74ce)}
+    .method-logo.ovo{background:linear-gradient(135deg,#4c3494,#6a5acd)}
+    .method-logo.gopay{background:linear-gradient(135deg,#00aa13,#00880f)}
+    .method-name{font-weight:700;font-size:15px;margin-bottom:4px}
+    .method-desc{color:#aaa;font-size:12px}
+    .footer{text-align:center;padding:35px 0;color:#666;font-size:12px}
+    .music-btn{position:fixed;bottom:22px;right:22px;background:rgba(0,212,170,0.2);border:2px solid #00d4aa;border-radius:50%;width:48px;height:48px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.25s;z-index:100;font-size:20px}
+    .music-btn:hover{background:#00d4aa;transform:scale(1.1)}
+    .music-btn.playing{animation:beat 1s infinite}
+    @keyframes beat{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+    @media(max-width:768px){.stats{grid-template-columns:1fr}.methods{grid-template-columns:repeat(2,1fr)}.title{font-size:23px}}
+    .glow{text-shadow:0 0 12px #00d4aa,0 0 25px #00d4aa}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">JP</div>
+      <h1 class="title glow">All Payments Jery Pets</h1>
+      <p class="subtitle">Cepat • Aman • Terpercaya • Integrated</p>
+    </div>
+    <div class="stats">
+      <div class="stat-box">
+        <div style="font-size:36px">📊</div>
+        <div class="stat-number" id="totalTx">0</div>
+        <div class="stat-label">Total Transaksi</div>
+      </div>
+      <div class="stat-box">
+        <div style="font-size:36px">✅</div>
+        <div class="stat-number" id="successTx">0</div>
+        <div class="stat-label">Berhasil</div>
+      </div>
+    </div>
+
+    <div class="marquee">
+      <div class="marquee-text">
+        <span>✨ Pembayaran Instant</span>
+        <span>🔒 Enkripsi End-to-End</span>
+        <span>⚡ Respon Cepat</span>
+        <span>🎁 Bonus Transaksi</span>
+        <span>🌟 Support 24/7</span>
+        <span>✨ Pembayaran Instant</span>
+        <span>🔒 Enkripsi End-to-End</span>
+      </div>
+    </div>
+
+    <h2 style="text-align:center;margin:35px 0 22px;font-size:19px">Pilih Metode Pembayaran</h2>
+    
+    <div class="methods">
+      <div class="method-card" onclick="nav('qriscode.html')">
+        <div class="method-logo qris">🔑</div>
+        <div class="method-name">QRIS + Code</div>
+        <div class="method-desc">Input code → Auto QRIS</div>
+      </div>
+      <div class="method-card" onclick="nav('qrisotomatis.html')">
+        <div class="method-logo qris">⚡</div>
+        <div class="method-name">QRIS Otomatis</div>
+        <div class="method-desc">Input nominal → Generate</div>
+      </div>
+      <div class="method-card" onclick="nav('qrismanual.html')">
+        <div class="method-logo qris">📷</div>
+        <div class="method-name">QRIS Manual</div>
+        <div class="method-desc">Scan foto QR statis</div>
+      </div>
+      <div class="method-card" onclick="nav('dana.html')">
+        <div class="method-logo dana">D</div>
+        <div class="method-name">Dana</div>
+        <div class="method-desc">Transfer E-Wallet</div>
+      </div>
+      <div class="method-card" onclick="nav('ovo.html')">        <div class="method-logo ovo">O</div>
+        <div class="method-name">Ovo</div>
+        <div class="method-desc">Transfer E-Wallet</div>
+      </div>
+      <div class="method-card" onclick="nav('gopay.html')">
+        <div class="method-logo gopay">G</div>
+        <div class="method-name">GO-PAY</div>
+        <div class="method-desc">Transfer E-Wallet</div>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin:30px 0">
+      <a href="about.html" style="color:#00d4aa;text-decoration:none;font-size:14px;font-weight:500">ℹ️ Tentang Sistem Ini</a>
+    </div>
+
+    <div class="footer">
+      <p>© 2024 Jery Pets Payment • Whoosh Real Integration</p>
+      <p style="margin-top:6px;color:#555">All transactions secured & encrypted</p>
+    </div>
+  </div>
+
+  <div class="music-btn" id="musicBtn" onclick="toggleMusic()">🎵</div>
+  <audio id="bgMusic" loop>
+    <source src="storage/music.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    function nav(page){
+      localStorage.setItem('last_page', window.location.href);
+      window.location.href = page;
+    }
+
+    function loadStats(){
+      const history = JSON.parse(localStorage.getItem('payment_history')||'[]');
+      document.getElementById('totalTx').textContent = history.length;
+      document.getElementById('successTx').textContent = history.filter(h=>h.status==='success').length;
+    }
+
+    const music = document.getElementById('bgMusic');
+    const musicBtn = document.getElementById('musicBtn');
+    let isPlaying = false;
+    
+    function toggleMusic(){
+      if(isPlaying){
+        music.pause();
+        musicBtn.classList.remove('playing');
+        musicBtn.textContent = '🎵';
+      } else {
+        music.play().then(()=>{
+          musicBtn.classList.add('playing');          musicBtn.textContent = '🔊';
+        }).catch(()=>alert('Klik halaman dulu untuk aktifkan musik!'));
+      }
+      isPlaying = !isPlaying;
+    }
+
+    // Init
+    loadStats();
+    if(!localStorage.getItem('payment_history')) localStorage.setItem('payment_history', JSON.stringify([]));
+    if(!localStorage.getItem('code_database')){
+      localStorage.setItem('code_database', JSON.stringify({
+        'jery_cod1276': {nominal:20000, valid:true, expiry:'2025-12-31'},
+        'pets_vip99': {nominal:50000, valid:true, expiry:'2025-12-31'}
+      }));
+    }
+  </script>
+</body>
+</html>

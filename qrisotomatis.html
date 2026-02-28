@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QRIS Otomatis - Jery Pets</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif}
+    body{background:linear-gradient(135deg,#0f0f1a,#1a1a2e,#16213e);color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+    .card{background:rgba(255,255,255,0.08);border-radius:24px;padding:35px;max-width:480px;width:100%;backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.15);box-shadow:0 25px 50px rgba(0,0,0,0.5)}
+    .header{text-align:center;margin-bottom:28px}
+    .logo{width:75px;height:75px;border-radius:50%;background:linear-gradient(135deg,#00d4aa,#0099ff);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:28px;font-weight:800;box-shadow:0 12px 35px rgba(0,212,170,0.35);animation:float 3s ease-in-out infinite}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+    .title{font-size:22px;font-weight:700;margin-bottom:6px}
+    .subtitle{color:#aaa;font-size:13px}
+    .input-group{margin:22px 0}
+    .input-group label{display:block;margin-bottom:10px;color:#ccc;font-size:13px;font-weight:500}
+    .input-group input{width:100%;padding:14px 18px;border-radius:14px;border:2px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.08);color:#fff;font-size:16px;transition:all 0.25s}
+    .input-group input:focus{outline:none;border-color:#00d4aa;box-shadow:0 0 0 4px rgba(0,212,170,0.15)}
+    .amount-preview{background:rgba(0,212,170,0.12);border-radius:14px;padding:16px;text-align:center;margin:18px 0;border:1px solid rgba(0,212,170,0.25)}
+    .amount-label{color:#aaa;font-size:13px;margin-bottom:4px}
+    .amount-value{font-size:26px;font-weight:800;color:#00d4aa}
+    .btn{width:100%;padding:15px;border-radius:14px;border:none;font-size:15px;font-weight:600;cursor:pointer;transition:all 0.25s;margin-top:8px}
+    .btn-primary{background:linear-gradient(135deg,#00d4aa,#0099ff);color:#fff}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 35px rgba(0,212,170,0.4)}
+    .btn-primary:disabled{opacity:0.6;cursor:not-allowed;transform:none}
+    .btn-secondary{background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.25)}
+    .btn-secondary:hover{background:rgba(255,255,255,0.18)}
+    .error{color:#ff6b6b;font-size:13px;margin-top:12px;display:none;background:rgba(255,107,107,0.12);padding:10px 14px;border-radius:10px;border-left:3px solid #ff6b6b}
+    .loading{display:none;text-align:center;margin:22px 0}
+    .spinner{width:28px;height:28px;border:3px solid rgba(255,255,255,0.25);border-top-color:#00d4aa;border-radius:50%;animation:spin 0.9s linear infinite;margin:0 auto}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .back-btn{position:fixed;top:18px;left:18px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);color:#fff;padding:9px 18px;border-radius:11px;cursor:pointer;transition:all 0.25s;z-index:100;font-size:14px}
+    .back-btn:hover{background:rgba(255,255,255,0.2)}
+    .warning{background:rgba(255,193,7,0.12);border-left:4px solid #ffc107;padding:12px;border-radius:0 10px 10px 0;margin:18px 0;font-size:12px;color:#ffe08a}
+    .api-note{font-size:11px;color:#666;margin-top:20px;text-align:center;line-height:1.5}
+    .min-amount{font-size:12px;color:#888;margin-top:6px}
+  </style>
+</head>
+<body>
+  <button class="back-btn" onclick="goBack()">← Kembali</button>
+  
+  <div class="card">
+    <div class="header">
+      <div class="logo">⚡</div>
+      <h1 class="title">QRIS Otomatis</h1>
+      <p class="subtitle">Input nominal → Generate QRIS real via AtlanticH2H</p>
+    </div>
+
+    <div class="warning">      ⚡ Menggunakan API AtlanticH2H REAL<br>
+      ⚠️ Pastikan koneksi internet stabil
+    </div>
+
+    <div class="input-group">
+      <label for="nominalInput">Nominal Pembayaran (Rp)</label>
+      <input type="number" id="nominalInput" placeholder="Minimal 1000" min="1000" value="20000">
+      <div class="min-amount">Minimum: Rp 1.000 • Maximum: Rp 10.000.000</div>
+    </div>
+
+    <div class="amount-preview">
+      <div class="amount-label">Total Bayar</div>
+      <div class="amount-value" id="totalAmount">Rp 20.000</div>
+    </div>
+
+    <div class="error" id="errorMsg"></div>
+
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <p style="margin-top:12px;color:#aaa;font-size:13px">Memproses request ke AtlanticH2H...</p>
+    </div>
+
+    <button class="btn btn-primary" id="generateBtn" onclick="generateQRIS()">Buat QRIS Sekarang</button>
+    <button class="btn btn-secondary" onclick="goBack()" style="margin-top:10px">Batal</button>
+
+    <div class="api-note">
+      🔗 Endpoint: https://atlantich2h.com/deposit/create<br>
+      🔐 API Key: Terintegrasi • Method: POST • Content-Type: application/x-www-form-urlencoded
+    </div>
+  </div>
+
+  <script>
+    // ===== KONFIGURASI ATLANTICH2H =====
+    const ATLANTIC = {
+      apiKey: "ca0uoSsJpUuTEVUBo2Wmu01eAtZH6eoYWbcEQkU4JxcxSBciNPMTUWzF4Mcb8A61Km9d4SOZ2eeXY64FAt9MgIImudkjLVAxvfj0",
+      baseUrl: "https://atlantich2h.com"
+    };
+
+    // ===== UTILITAS =====
+    function goBack(){
+      const last = localStorage.getItem('last_page') || 'dashboard.html';
+      window.location.href = last;
+    }
+
+    function formatRupiah(amount){
+      return new Intl.NumberFormat('id-ID', {style:'currency', currency:'IDR', minimumFractionDigits:0}).format(amount);
+    }
+
+    function addToHistory(data){
+      const history = JSON.parse(localStorage.getItem('payment_history') || '[]');      history.unshift({id: Date.now(), ...data, timestamp: new Date().toISOString()});
+      localStorage.setItem('payment_history', JSON.stringify(history));
+    }
+
+    // ===== UPDATE DISPLAY NOMINAL =====
+    document.getElementById('nominalInput').addEventListener('input', function(){
+      const val = parseInt(this.value) || 0;
+      document.getElementById('totalAmount').textContent = formatRupiah(val);
+    });
+
+    // ===== ATLANTICH2H: CREATE DEPOSIT (REAL API CALL) =====
+    async function createAtlanticDeposit(reffId, nominal){
+      const formData = new URLSearchParams();
+      formData.append('api_key', ATLANTIC.apiKey);
+      formData.append('reff_id', reffId);
+      formData.append('nominal', parseInt(nominal));
+      formData.append('type', 'ewallet');
+      formData.append('metode', 'qris');
+
+      const response = await fetch(`${ATLANTIC.baseUrl}/deposit/create`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: formData,
+        mode: 'cors'
+      });
+
+      if(!response.ok){
+        const errorText = await response.text().catch(()=> 'Unknown error');
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+
+      const result = await response.json();
+      
+      // Validasi response structure AtlanticH2H
+      if(result.status !== true && result.status !== 'success'){
+        if(result.message){
+          throw new Error(result.message);
+        }
+        throw new Error('Response API tidak valid');
+      }
+
+      return result;
+    }
+
+    // ===== GENERATE QRIS =====
+    async function generateQRIS(){
+      const nominalInput = document.getElementById('nominalInput');
+      const nominal = parseInt(nominalInput.value);
+      const errorMsg = document.getElementById('errorMsg');
+      const loading = document.getElementById('loading');      const generateBtn = document.getElementById('generateBtn');
+
+      // Validasi nominal
+      if(!nominal || nominal < 1000){
+        errorMsg.textContent = '⚠️ Nominal minimal Rp 1.000';
+        errorMsg.style.display = 'block';
+        nominalInput.focus();
+        return;
+      }
+      if(nominal > 10000000){
+        errorMsg.textContent = '⚠️ Nominal maksimal Rp 10.000.000';
+        errorMsg.style.display = 'block';
+        return;
+      }
+
+      errorMsg.style.display = 'none';
+      loading.style.display = 'block';
+      generateBtn.disabled = true;
+
+      try{
+        // Generate unique reference ID
+        const reffId = `jery_auto_${Date.now()}_${Math.random().toString(36).substr(2,8)}`;
+
+        // Call AtlanticH2H API (REAL)
+        const result = await createAtlanticDeposit(reffId, nominal);
+
+        // Extract transaction data
+        const txData = {
+          id: result.data?.id || result.transaction_id || reffId,
+          reff_id: reffId,
+          nominal: nominal,
+          qr_code: result.data?.qr_code || result.qr_string || result.qr_url,
+          qr_image: result.data?.qr_image,
+          status: 'pending',
+          created_at: new Date().toISOString(),
+          method: 'qris_otomatis'
+        };
+
+        // Validasi QR code diterima
+        if(!txData.qr_code && !txData.qr_image){
+          console.warn('QR data tidak lengkap di response');
+        }
+
+        // Simpan ke sessionStorage
+        sessionStorage.setItem('atlantic_tx', JSON.stringify(txData));
+        sessionStorage.setItem('payment_method', 'qris_otomatis');
+
+        // Catat ke history
+        addToHistory({
+          reff_id: reffId,          nominal: nominal,
+          method: 'qris_otomatis',
+          status: 'pending',
+          tx_id: txData.id
+        });
+
+        // Redirect ke halaman display QRIS
+        window.location.href = 'qriscreate.html';
+
+      } catch(err){
+        console.error('AtlanticH2H Error:', err);
+        errorMsg.innerHTML = `❌ Gagal: ${err.message}<br><small style="color:#888">Periksa koneksi atau coba lagi</small>`;
+        errorMsg.style.display = 'block';
+
+        // Fallback untuk demo jika CORS/network error
+        if(err.message.includes('CORS') || err.message.includes('Failed to fetch') || err.message.includes('Network')){
+          setTimeout(()=>{
+            if(confirm('⚠️ Koneksi ke AtlanticH2H gagal.\n\nDemo mode: Simulasikan QRIS berhasil dibuat?')){
+              const reffId = `demo_${Date.now()}`;
+              sessionStorage.setItem('atlantic_tx', JSON.stringify({
+                id: reffId,
+                reff_id: reffId,
+                nominal: nominal,
+                qr_code: null,
+                status: 'pending',
+                created_at: new Date().toISOString(),
+                method: 'qris_otomatis',
+                _demo: true
+              }));
+              sessionStorage.setItem('payment_method', 'qris_otomatis');
+              addToHistory({reff_id: reffId, nominal, method: 'qris_otomatis', status: 'pending_demo'});
+              window.location.href = 'qriscreate.html';
+            } else {
+              loading.style.display = 'none';
+              generateBtn.disabled = false;
+            }
+          }, 1000);
+          return;
+        }
+      } finally{
+        loading.style.display = 'none';
+        generateBtn.disabled = false;
+      }
+    }
+
+    // ===== EVENT HANDLERS =====
+    document.getElementById('nominalInput').addEventListener('keypress', (e)=>{
+      if(e.key === 'Enter') generateQRIS();
+    });
+    // Init localStorage
+    if(!localStorage.getItem('payment_history')){
+      localStorage.setItem('payment_history', JSON.stringify([]));
+    }
+  </script>
+</body>
+</html>

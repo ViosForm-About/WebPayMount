@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gopay - Jery Pets</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif}
+    body{background:linear-gradient(135deg,#0f0f1a,#1a1a2e,#16213e);color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+    .card{background:rgba(255,255,255,0.08);border-radius:24px;padding:35px;max-width:450px;width:100%;backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.15);box-shadow:0 25px 50px rgba(0,0,0,0.5)}
+    .header{text-align:center;margin-bottom:28px}
+    linear-gradient(135deg,#00aa13,#00880f){width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,#118eea,#0d74ce);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:30px;font-weight:800;box-shadow:0 12px 35px rgba(17,142,234,0.35)}
+    .title{font-size:22px;font-weight:700;margin-bottom:6px}
+    .subtitle{color:#aaa;font-size:13px}
+    .account-box{background:rgba(0,0,0,0.25);border-radius:16px;padding:22px;margin:22px 0}
+    .account-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+    .account-label{color:#ccc;font-size:13px;font-weight:500}
+    .copy-btn{background:#00d4aa;color:#000;padding:7px 15px;border-radius:9px;border:none;font-weight:600;cursor:pointer;transition:all 0.2s;font-size:13px}
+    .copy-btn:hover{background:#00b894;transform:scale(1.03)}
+    .copy-btn.copied{background:#2ecc71;color:#fff}
+    .account-number{font-size:22px;font-weight:700;letter-spacing:3px;font-family:monospace;text-align:center;margin:8px 0}
+    .an-text{color:#aaa;font-size:13px;margin-top:12px;text-align:center}
+    .an-value{font-weight:700;color:#00d4aa}
+    .btn{width:100%;padding:15px;border-radius:14px;border:none;font-size:15px;font-weight:600;cursor:pointer;transition:all 0.25s;margin-top:10px}
+    .btn-primary{background:linear-gradient(135deg,#118eea,#0d74ce);color:#fff}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 35px rgba(17,142,234,0.4)}
+    .btn-secondary{background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.25)}
+    .btn-secondary:hover{background:rgba(255,255,255,0.18)}
+    .back-btn{position:fixed;top:18px;left:18px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);color:#fff;padding:9px 18px;border-radius:11px;cursor:pointer;transition:all 0.25s;z-index:100;font-size:14px}
+    .back-btn:hover{background:rgba(255,255,255,0.2)}
+    .info{background:rgba(17,142,234,0.15);border-left:4px solid #118eea;padding:13px;border-radius:0 10px 10px 0;margin:18px 0;font-size:13px;color:#a5d8ff;text-align:left}
+    .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#2ecc71;color:#fff;padding:11px 24px;border-radius:28px;font-weight:600;box-shadow:0 12px 35px rgba(0,0,0,0.35);opacity:0;transition:opacity 0.25s;z-index:1000;pointer-events:none;font-size:14px}
+    .toast.show{opacity:1}
+  </style>
+</head>
+<body>
+  <button class="back-btn" onclick="goBack()">← Kembali</button>
+  
+  <div class="card">
+    <div class="header">
+      <div class="logo">D</div>
+      <h1 class="title">Pembayaran Gopay</h1>
+      <p class="subtitle">Transfer ke nomor berikut</p>
+    </div>
+
+    <div class="info">
+      ✅ Pastikan nominal transfer sesuai<br>
+      ✅ Sertakan kode unik jika diminta admin<br>
+      ✅ Simpan bukti transfer untuk konfirmasi
+    </div>
+    <div class="account-box">
+      <div class="account-header">
+        <span class="account-label">Nomor Gopay</span>
+        <button class="copy-btn" id="copyBtn" onclick="copyNumber()">Salin</button>
+      </div>
+      <div class="account-number" id="accountNumber">0823-1374-6307</div>
+      <div class="an-text">a/n <span class="an-value">Ke*v** Nel***</span></div>
+    </div>
+
+    <button class="btn btn-primary" onclick="confirmPayment()">✓ Saya Sudah Transfer</button>
+    <button class="btn btn-secondary" onclick="goBack()" style="margin-top:10px">Batal</button>
+  </div>
+
+  <div class="toast" id="toast">✓ Tersalin ke clipboard!</div>
+
+  <script>
+    // ===== KONFIGURASI - GANTI DENGAN DATA ASLI =====
+    const CONFIG = {
+      accountNumber: '082313746307',  // Tanpa strip
+      accountName: 'ViosShop',
+      telegram: 'https://t.me/JeryPets'
+    };
+
+    // Set display
+    document.getElementById('accountNumber').textContent = CONFIG.accountNumber.replace(/(\d{4})/g, '$1-').slice(0,-1);
+    document.querySelector('.an-value').textContent = CONFIG.accountName;
+
+    function goBack(){
+      const last = localStorage.getItem('last_page') || 'dashboard.html';
+      window.location.href = last;
+    }
+
+    function copyNumber(){
+      navigator.clipboard.writeText(CONFIG.accountNumber).then(()=>{
+        const btn = document.getElementById('copyBtn');
+        const toast = document.getElementById('toast');
+        btn.textContent = '✓';
+        btn.classList.add('copied');
+        toast.classList.add('show');
+        setTimeout(()=>{
+          btn.textContent = 'Salin';
+          btn.classList.remove('copied');
+          toast.classList.remove('show');
+        }, 2000);
+      }).catch(()=>{
+        alert('Gagal menyalin. Salin manual: ' + CONFIG.accountNumber);
+      });
+    }
+    function confirmPayment(){
+      // Simpan ke history
+      const history = JSON.parse(localStorage.getItem('payment_history')||'[]');
+      history.unshift({
+        id: Date.now(),
+        method: 'Gopay',
+        nominal: 0,
+        status: 'pending_manual',
+        timestamp: new Date().toISOString(),
+        account: CONFIG.accountNumber,
+        account_name: CONFIG.accountName
+      });
+      localStorage.setItem('payment_history', JSON.stringify(history));
+      
+      // Redirect ke success
+      if(confirm('Konfirmasi: Anda sudah melakukan transfer ke Gopay?')){
+        sessionStorage.setItem('payment_success', 'manual_confirmed');
+        sessionStorage.setItem('payment_method', 'Gopay');
+        window.location.href = 'detailsucces.html';
+      }
+    }
+
+    // Init localStorage
+    if(!localStorage.getItem('payment_history')){
+      localStorage.setItem('payment_history', JSON.stringify([]));
+    }
+  </script>
+</body>
+</html>
